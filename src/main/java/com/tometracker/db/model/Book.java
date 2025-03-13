@@ -12,21 +12,20 @@ import java.util.List;
 
 @Entity
 @Table(name = "books")
+@Getter
 public class Book {
     @Id
     private String gbId;
     private long isbn13;
     private String title;
-    @Getter
     @Setter
     private Enums.status status;
-    @Getter
     @Setter
     private Double userRating;
+    @Column(length = 512)
     private String coverUrl;
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    @Getter
     private List<Note> notes = new ArrayList<>();
 
     public Book(BookDTO bookDTO) {

@@ -1,5 +1,6 @@
 package com.tometracker.service;
 
+import com.tometracker.data_template.Enums;
 import com.tometracker.db.model.Book;
 import com.tometracker.db.repository.BookRepository;
 import com.tometracker.dto.BookDTO;
@@ -7,6 +8,8 @@ import com.tometracker.dto.BookUpdateDTO;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -16,12 +19,23 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public Iterable<Book> getAll() {
-        return bookRepository.findAll();
+    public Iterable<Book> getAll(String status) {
+        if (status == null || status.isEmpty()) {
+            return bookRepository.findAll();
+        }
+        else {
+            try {
+                Enums.status statusEnum = Enums.status.valueOf(status);
+                return bookRepository.findBooksByStatus(statusEnum);
+            }
+            catch (IllegalArgumentException e) {
+                throw new EntityNotFoundException("Invalid game status " + e.getMessage());
+            }
+        }
     }
 
-    public void get(String gbId) {
-        bookRepository.findBookByGbId((gbId));
+    public Optional<Book> get(String gbId) {
+        return bookRepository.findBookByGbId((gbId));
     }
 
     public Book add(BookDTO bookDTO) {
@@ -30,7 +44,7 @@ public class BookService {
 
     public void update(String gbId, BookUpdateDTO bookUpdateDTO) {
         Book book = bookRepository.findBookByGbId(gbId).orElseThrow(
-                () -> new EntityNotFoundException("Game with id " + bookUpdateDTO.gbId() + " not found"));
+                () -> new EntityNotFoundException("Game with id " + gbId + " not found"));
         book.setStatus(bookUpdateDTO.status().orElse(book.getStatus()));
         book.setUserRating(bookUpdateDTO.userRating().orElse(book.getUserRating()));
 
@@ -50,5 +64,9 @@ public class BookService {
     @Transactional
     public void delete(String gbId) {
         bookRepository.deleteBookByGbId(gbId);
+    }
+
+    public boolean isContains(String gId) {
+        return bookRepository.existsBookByGbId(gId);
     }
 }
