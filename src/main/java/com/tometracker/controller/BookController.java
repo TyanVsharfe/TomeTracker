@@ -2,7 +2,7 @@ package com.tometracker.controller;
 
 import com.tometracker.db.model.Book;
 import com.tometracker.dto.BookDTO;
-import com.tometracker.dto.BookUpdateDTO;
+import com.tometracker.dto.UserBookUpdateDTO;
 import com.tometracker.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +28,12 @@ public class BookController {
     }
 
     @GetMapping("/all")
-    public Iterable<Book> getAll(@RequestParam(value = "status", required = false) String status) {
-        return bookService.getAll(status);
+    public Iterable<Book> getAll() {
+        return bookService.getAll();
     }
 
-    @PutMapping("{id}")
-    public void update(@PathVariable("id") String id, @RequestBody BookUpdateDTO bookDTO) {
+    @PutMapping("")
+    public void update(@PathVariable("id") String id, @RequestBody UserBookUpdateDTO bookDTO) {
         bookService.update(id, bookDTO);
     }
 
@@ -42,7 +42,7 @@ public class BookController {
         bookService.delete(id);
     }
 
-    @GetMapping("/checkEntity/{id}")
+    @GetMapping("/check-entity/{id}")
     public boolean isContains(@PathVariable("id") String id) {
         return bookService.isContains(id);
     }

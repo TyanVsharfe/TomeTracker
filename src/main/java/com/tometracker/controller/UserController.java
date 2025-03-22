@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,6 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDTO user, HttpServletRequest request) {
-        System.out.println("Login attempt: " + user.username() + " " + user.password());
 
         if (user.username() == null || user.password() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or password is missing");
@@ -54,5 +54,16 @@ public class UserController {
             System.out.println("Authentication failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials: " + e.getMessage());
         }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        SecurityContextHolder.clearContext();
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.ok("Logout successful");
     }
 }

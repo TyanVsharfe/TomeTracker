@@ -12,8 +12,8 @@ public class Note {
     private Long id;
     private String content;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bookId", referencedColumnName = "gbId")
+    @JoinColumn(name = "user_book_id", referencedColumnName = "id")
     @JsonBackReference
     @Setter
-    private Book book;
+    private UserBook user_book;
 }

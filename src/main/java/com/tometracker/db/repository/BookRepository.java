@@ -12,6 +12,4 @@ public interface BookRepository extends CrudRepository<Book, Long> {
     void deleteBookByGbId(String gb_id);
     boolean existsBookByGbId(String gId);
     Optional<Book> findBookByGbId(String gb_id);
-    Iterable<Book> findBooksByStatus(Enums.status status);
-    long countBooksByStatus(Enums.status status);
 }

@@ -15,8 +15,8 @@ public class SecurityContextLoggingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        System.out.println("Request URI: " + request.getRequestURI());
-        System.out.println("Authentication: " + SecurityContextHolder.getContext().getAuthentication());
+        System.out.println("<Request URI: " + request.getRequestURI());
+        System.out.println("Authentication: " + SecurityContextHolder.getContext().getAuthentication() + ">");
 
         filterChain.doFilter(request, response);
     }

@@ -37,27 +37,27 @@ public class GoogleBooksAPI {
             return "";
         }
 
-        for (Volume volume : volumes.getItems()) {
-            System.out.println(volume.getSaleInfo().getRetailPrice()); // Текущая цена
-            System.out.println(volume.getSaleInfo().getBuyLink() + "\n--------");
-            System.out.println();
-
-            Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
-            System.out.println("Название: " + volumeInfo.getTitle());
-            System.out.println("Авторы: " + volumeInfo.getAuthors());
-            System.out.println("Описание: " + volumeInfo.getDescription());
-            System.out.println(volumeInfo.getContentVersion() + "\n" + volumeInfo.getPublishedDate()
-                    + "\n" + volumeInfo.getAverageRating() + "\n" + volumeInfo.getPageCount()
-                    + "\n" + volumeInfo.getLanguage() + "\n" + volumeInfo.getPrintType()
-                    + "\n" + volumeInfo.getPrintedPageCount() + "\n" + volumeInfo.getCategories());
-
-            if (volumeInfo.getIndustryIdentifiers() != null) {
-                for (Volume.VolumeInfo.IndustryIdentifiers identifiers : volumeInfo.getIndustryIdentifiers()) {
-                    System.out.println(identifiers);
-                }
-            }
-            System.out.println("-------------------------");
-        }
+//        for (Volume volume : volumes.getItems()) {
+//            System.out.println(volume.getSaleInfo().getRetailPrice()); // Текущая цена
+//            System.out.println(volume.getSaleInfo().getBuyLink() + "\n--------");
+//            System.out.println();
+//
+//            Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+//            System.out.println("Название: " + volumeInfo.getTitle());
+//            System.out.println("Авторы: " + volumeInfo.getAuthors());
+//            System.out.println("Описание: " + volumeInfo.getDescription());
+//            System.out.println(volumeInfo.getContentVersion() + "\n" + volumeInfo.getPublishedDate()
+//                    + "\n" + volumeInfo.getAverageRating() + "\n" + volumeInfo.getPageCount()
+//                    + "\n" + volumeInfo.getLanguage() + "\n" + volumeInfo.getPrintType()
+//                    + "\n" + volumeInfo.getPrintedPageCount() + "\n" + volumeInfo.getCategories());
+//
+//            if (volumeInfo.getIndustryIdentifiers() != null) {
+//                for (Volume.VolumeInfo.IndustryIdentifiers identifiers : volumeInfo.getIndustryIdentifiers()) {
+//                    System.out.println(identifiers);
+//                }
+//            }
+//            System.out.println("-------------------------");
+//        }
 
         return new Gson().toJson(volumes);
     }
@@ -75,21 +75,21 @@ public class GoogleBooksAPI {
             return "";
         }
 
-        Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
-        System.out.println("Название: " + volumeInfo.getTitle());
-        System.out.println("Авторы: " + volumeInfo.getAuthors());
-        System.out.println("Описание: " + volumeInfo.getDescription());
-        System.out.println(volumeInfo.getContentVersion() + "\n" + volumeInfo.getPublishedDate()
-                + "\n" + volumeInfo.getAverageRating() + "\n" + volumeInfo.getPageCount()
-                + "\n" + volumeInfo.getLanguage() + "\n" + volumeInfo.getPrintType()
-                + "\n" + volumeInfo.getPrintedPageCount() + "\n" + volumeInfo.getCategories());
-
-        if (volumeInfo.getIndustryIdentifiers() != null) {
-            for (Volume.VolumeInfo.IndustryIdentifiers identifiers : volumeInfo.getIndustryIdentifiers()) {
-                System.out.println(identifiers);
-            }
-        }
-        System.out.println("-------------------------");
+//        Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+//        System.out.println("Название: " + volumeInfo.getTitle());
+//        System.out.println("Авторы: " + volumeInfo.getAuthors());
+//        System.out.println("Описание: " + volumeInfo.getDescription());
+//        System.out.println(volumeInfo.getContentVersion() + "\n" + volumeInfo.getPublishedDate()
+//                + "\n" + volumeInfo.getAverageRating() + "\n" + volumeInfo.getPageCount()
+//                + "\n" + volumeInfo.getLanguage() + "\n" + volumeInfo.getPrintType()
+//                + "\n" + volumeInfo.getPrintedPageCount() + "\n" + volumeInfo.getCategories());
+//
+//        if (volumeInfo.getIndustryIdentifiers() != null) {
+//            for (Volume.VolumeInfo.IndustryIdentifiers identifiers : volumeInfo.getIndustryIdentifiers()) {
+//                System.out.println(identifiers);
+//            }
+//        }
+//        System.out.println("-------------------------");
 
         return new Gson().toJson(volume);
     }
@@ -117,21 +117,21 @@ public class GoogleBooksAPI {
             return "";
         }
 
-        Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
-        System.out.println("Название: " + volumeInfo.getTitle());
-        System.out.println("Авторы: " + volumeInfo.getAuthors());
-        System.out.println("Описание: " + volumeInfo.getDescription());
-        System.out.println(volumeInfo.getContentVersion() + "\n" + volumeInfo.getPublishedDate()
-                + "\n" + volumeInfo.getAverageRating() + "\n" + volumeInfo.getPageCount()
-                + "\n" + volumeInfo.getLanguage() + "\n" + volumeInfo.getPrintType()
-                + "\n" + volumeInfo.getPrintedPageCount() + "\n" + volumeInfo.getCategories());
-
-        if (volumeInfo.getIndustryIdentifiers() != null) {
-            for (Volume.VolumeInfo.IndustryIdentifiers identifiers : volumeInfo.getIndustryIdentifiers()) {
-                System.out.println(identifiers);
-            }
-        }
-        System.out.println("-------------------------");
+//        Volume.VolumeInfo volumeInfo = volume.getVolumeInfo();
+//        System.out.println("Название: " + volumeInfo.getTitle());
+//        System.out.println("Авторы: " + volumeInfo.getAuthors());
+//        System.out.println("Описание: " + volumeInfo.getDescription());
+//        System.out.println(volumeInfo.getContentVersion() + "\n" + volumeInfo.getPublishedDate()
+//                + "\n" + volumeInfo.getAverageRating() + "\n" + volumeInfo.getPageCount()
+//                + "\n" + volumeInfo.getLanguage() + "\n" + volumeInfo.getPrintType()
+//                + "\n" + volumeInfo.getPrintedPageCount() + "\n" + volumeInfo.getCategories());
+//
+//        if (volumeInfo.getIndustryIdentifiers() != null) {
+//            for (Volume.VolumeInfo.IndustryIdentifiers identifiers : volumeInfo.getIndustryIdentifiers()) {
+//                System.out.println(identifiers);
+//            }
+//        }
+//        System.out.println("-------------------------");
 
         return new Gson().toJson(volume);
     }

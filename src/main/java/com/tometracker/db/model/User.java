@@ -16,10 +16,15 @@ public class User implements UserDetails {
     @GeneratedValue
     @Getter
     private Long id;
+    @Getter
     @Setter
     private String username;
+    @Getter
     @Setter
     private String password;
+    @Setter
+    private String email;
+    @Getter
     @Setter
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
@@ -29,10 +34,6 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.roles = roles;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     @Override
@@ -55,16 +56,9 @@ public class User implements UserDetails {
         return List.of();
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     @Override
     public boolean isEnabled() {
         return true;
     }
 
-    public List<String> getRoles() {
-        return roles;
-    }
 }
