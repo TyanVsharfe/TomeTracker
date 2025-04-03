@@ -44,6 +44,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(registry -> registry
                     .requestMatchers("/gbooks/**").permitAll()
+                    .requestMatchers("/users/books/*/reviews").permitAll()
                     .requestMatchers(REGISTRATION_URL, LOGIN_URL).permitAll()
                     .anyRequest().authenticated())
             .csrf(AbstractHttpConfigurer::disable)

@@ -30,6 +30,10 @@ public class UserBook {
     private List<Note> notes = new ArrayList<>();
 
     @Setter
+    @Column(columnDefinition = "TEXT")
+    private String review;
+
+    @Setter
     private Enums.status status;
     @Setter
     private Double userRating;

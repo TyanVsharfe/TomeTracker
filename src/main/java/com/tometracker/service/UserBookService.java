@@ -9,6 +9,8 @@ import com.tometracker.db.repository.UserBookRepository;
 import com.tometracker.db.repository.UserRepository;
 import com.tometracker.dto.UserBookDTO;
 import com.tometracker.dto.UserBookUpdateDTO;
+import com.tometracker.dto.UserReviewsDTO;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
@@ -16,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserBookService {
@@ -86,6 +90,7 @@ public class UserBookService {
                     userBook.getBook(),
                     userBook.getStatus(),
                     userBook.getUserRating(),
+                    userBook.getReview(),
                     userBook.getNotes()
             );
             return Optional.of(userBookDTO);
@@ -100,6 +105,9 @@ public class UserBookService {
         Optional<User> author = userRepository.findByUsername(authentication.getName());
         if (author.isEmpty())
             throw new UsernameNotFoundException("");
+        Optional<UserBook> userBook = userBookRepository.findByBook_GbIdAndUser_Username(gbId,authentication.getName());
+        if (userBook.isPresent())
+            throw new EntityExistsException("Book already added");
         Optional<Book> book = bookRepository.findBookByGbId(gbId);
         System.out.println(book);
         if (book.isEmpty())
@@ -118,6 +126,7 @@ public class UserBookService {
                 () -> new EntityNotFoundException("Book with id " + gbId + " not found"));
         book.setStatus(userBookUpdateDTO.status().orElse(book.getStatus()));
         book.setUserRating(userBookUpdateDTO.userRating().orElse(book.getUserRating()));
+        book.setReview(userBookUpdateDTO.review().orElse(book.getReview()));
 
         if (userBookUpdateDTO.notes().isPresent()) {
             userBookUpdateDTO.notes().ifPresent(notes -> {
@@ -141,6 +150,23 @@ public class UserBookService {
             throw new UsernameNotFoundException("");
 
         userBookRepository.deleteBookByBook_GbIdAndUser_Username(gbId, author.get().getUsername());
+    }
+
+    public List<UserReviewsDTO> getBookReviews(String gbId) {
+        List<UserBook> reviews = userBookRepository.findByBookGbIdAndReviewIsNotNull(gbId);
+        return reviews.stream()
+                .filter(review -> review.getReview() != null && !review.getReview().isEmpty())
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private UserReviewsDTO convertToDTO(UserBook userBook) {
+        return new UserReviewsDTO(
+                userBook.getId(),
+                userBook.getUser().getUsername(),
+                userBook.getReview(),
+                userBook.getUserRating()
+        );
     }
 
     public boolean isContains(String gbId) {

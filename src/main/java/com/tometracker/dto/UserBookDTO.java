@@ -7,5 +7,5 @@ import com.tometracker.db.model.Note;
 import java.util.List;
 import java.util.Optional;
 
-public record UserBookDTO(Book book, Enums.status status, Double userRating, List<Note> notes){
+public record UserBookDTO(Book book, Enums.status status, Double userRating, String review, List<Note> notes){
 }

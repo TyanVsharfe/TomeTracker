@@ -5,10 +5,13 @@ import com.tometracker.db.model.UserBook;
 import com.tometracker.dto.BookDTO;
 import com.tometracker.dto.UserBookDTO;
 import com.tometracker.dto.UserBookUpdateDTO;
+import com.tometracker.dto.UserReviewsDTO;
 import com.tometracker.service.UserBookService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("users/books")
@@ -42,6 +45,11 @@ public class UserBookController {
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") String id) {
         userBookService.delete(id);
+    }
+
+    @GetMapping("/{gbId}/reviews")
+    public List<UserReviewsDTO> getBookReviews(@PathVariable String gbId) {
+        return userBookService.getBookReviews(gbId);
     }
 
     @GetMapping("/check-entity/{id}")
