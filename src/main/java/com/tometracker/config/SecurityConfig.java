@@ -1,5 +1,6 @@
 package com.tometracker.config;
 
+import com.tometracker.security.RestAuthenticationFilter;
 import com.tometracker.security.SecurityContextLoggingFilter;
 import com.tometracker.service.UserService;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import java.util.List;
 
@@ -39,24 +41,31 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authConfig) throws Exception {
+        AuthenticationManager authenticationManager = authConfig.getAuthenticationManager();
+
+        TokenBasedRememberMeServices rememberMeServices = new TokenBasedRememberMeServices("uniqueAndSecretKey", userDetailsService);
+        rememberMeServices.setTokenValiditySeconds(1209600);
+        rememberMeServices.setParameter("remember-me");
+
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(registry -> registry
                     .requestMatchers("/gbooks/**").permitAll()
                     .requestMatchers("/users/books/*/reviews").permitAll()
-                    .requestMatchers(REGISTRATION_URL, LOGIN_URL).permitAll()
+                    .requestMatchers(REGISTRATION_URL, "/users/login").permitAll()
                     .anyRequest().authenticated())
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
             )
-            .securityContext(securityContext -> securityContext
-                    .requireExplicitSave(true)
-            )
             .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
-            .addFilterBefore(new SecurityContextLoggingFilter(), UsernamePasswordAuthenticationFilter.class);
-
+            .addFilterBefore(new SecurityContextLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new RestAuthenticationFilter(authenticationManager, rememberMeServices), UsernamePasswordAuthenticationFilter.class)
+            .rememberMe(rememberMe -> rememberMe
+                    .userDetailsService(userDetailsService)
+                    .rememberMeServices(rememberMeServices)
+            );
 
         return http.build();
     }
@@ -74,8 +83,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public TokenBasedRememberMeServices rememberMeServices(UserService userDetailsService) {
+        TokenBasedRememberMeServices services = new TokenBasedRememberMeServices("uniqueAndSecretKey", userDetailsService);
+        services.setTokenValiditySeconds(1209600);
+        services.setParameter("remember-me");
+        return services;
     }
 
     @Bean

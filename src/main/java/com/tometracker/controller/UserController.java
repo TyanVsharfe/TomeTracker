@@ -5,28 +5,25 @@ import com.tometracker.data_template.UserInfo;
 import com.tometracker.service.UserBookService;
 import com.tometracker.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
     private final UserBookService userBookService;
+    private final TokenBasedRememberMeServices rememberMeServices;
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager, UserBookService userBookService) {
+    public UserController(UserService userService, UserBookService userBookService, TokenBasedRememberMeServices rememberMeServices) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
         this.userBookService = userBookService;
+        this.rememberMeServices = rememberMeServices;
     }
 
     @PostMapping("/registration")
@@ -34,37 +31,18 @@ public class UserController {
         return userService.addUser(user);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO user, HttpServletRequest request) {
-
-        if (user.username() == null || user.password() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or password is missing");
-        }
-
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user.username(), user.password());
-        System.out.println("Auth token: " + authToken);
-
-        try {
-            Authentication authentication = authenticationManager.authenticate(authToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            HttpSession session = request.getSession(true);
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-            System.out.println("Authenticated: " + authentication);
-            return ResponseEntity.ok("Login successful");
-        } catch (AuthenticationException e) {
-            System.out.println("Authentication failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials: " + e.getMessage());
-        }
-    }
-
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextHolder.clearContext();
+
+        HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
+
+        rememberMeServices.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+
         return ResponseEntity.ok("Logout successful");
     }
 

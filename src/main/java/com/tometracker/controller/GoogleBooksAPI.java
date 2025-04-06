@@ -25,12 +25,14 @@ public class GoogleBooksAPI {
     @PostMapping("")
     public String search(@RequestBody String searchBook) throws IOException {
         String decodedString = URLDecoder.decode(searchBook, StandardCharsets.UTF_8);
-        System.out.println(decodedString);
-        String query = "intitle:" + decodedString;
-        //String query = decodedString;
+        decodedString = decodedString.substring(0, decodedString.length() - 1);
+        System.out.println(decodedString + "\b");
+        //String query = "intitle:" + decodedString + "\b";
+        String query = decodedString + "\b";
         Books.Volumes.List volumesList = googleBooksClient.volumes().list(query);
-        volumesList.setOrderBy("relevance");
-        //volumesList.setLangRestrict("ru");
+        //volumesList.setOrderBy("relevance");
+        volumesList.setLangRestrict("ru");
+        volumesList.setMaxResults(40L);
 
         Volumes volumes = volumesList.execute();
         if (volumes.getTotalItems() == 0 || volumes.getItems() == null) {
