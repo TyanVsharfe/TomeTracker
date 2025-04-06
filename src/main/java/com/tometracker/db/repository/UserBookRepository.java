@@ -16,7 +16,8 @@ public interface UserBookRepository extends CrudRepository<UserBook, Long> {
     void deleteBookByBook_GbIdAndUser_Username(String gbId, String username);
     boolean existsBookByBook_GbIdAndUser_Username(String gbId, String username);
     Iterable<UserBook> findBooksByStatusAndUser_Username(Enums.status status, String username);
-    long countBooksByStatus(Enums.status status);
+    long countBooksByStatusAndUser_Username(Enums.status status, String username);
+    long countAllByUser_Username(String username);
 
     @Query("SELECT ub.book FROM UserBook ub WHERE ub.status = :status AND ub.user.username = :username")
     Iterable<Book> findBooksByStatusAndUserUsername(Enums.status status, String username);

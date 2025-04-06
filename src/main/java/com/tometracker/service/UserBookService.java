@@ -9,6 +9,7 @@ import com.tometracker.db.repository.UserBookRepository;
 import com.tometracker.db.repository.UserRepository;
 import com.tometracker.dto.UserBookDTO;
 import com.tometracker.dto.UserBookUpdateDTO;
+import com.tometracker.data_template.UserInfo;
 import com.tometracker.dto.UserReviewsDTO;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -177,5 +179,23 @@ public class UserBookService {
             throw new UsernameNotFoundException("");
 
         return userBookRepository.existsBookByBook_GbIdAndUser_Username(gbId, author.get().getUsername());
+    }
+
+    public UserInfo getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication in /getInfo: " + authentication.getName());
+        Optional<User> author = userRepository.findByUsername(authentication.getName());
+        if (author.isEmpty())
+            throw new UsernameNotFoundException("");
+        String username = author.get().getUsername();
+
+        List <UserInfo.UserBookCountInfo> userBookQuantity = new ArrayList<>();
+        for(Enums.status status: Enums.status.values())
+            userBookQuantity.add(new UserInfo.UserBookCountInfo(status.name(), userBookRepository.countBooksByStatusAndUser_Username(status, username)));
+
+        return new UserInfo(username,
+                userBookRepository.countAllByUser_Username(username),
+                userBookQuantity
+                );
     }
 }

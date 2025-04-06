@@ -4,6 +4,7 @@ import com.google.api.services.books.v1.Books;
 import com.google.api.services.books.v1.model.Volume;
 import com.google.api.services.books.v1.model.Volumes;
 import com.google.gson.Gson;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -25,8 +26,8 @@ public class GoogleBooksAPI {
     public String search(@RequestBody String searchBook) throws IOException {
         String decodedString = URLDecoder.decode(searchBook, StandardCharsets.UTF_8);
         System.out.println(decodedString);
-        //String query = "intitle:" + decodedString;
-        String query = decodedString;
+        String query = "intitle:" + decodedString;
+        //String query = decodedString;
         Books.Volumes.List volumesList = googleBooksClient.volumes().list(query);
         volumesList.setOrderBy("relevance");
         //volumesList.setLangRestrict("ru");
@@ -63,6 +64,7 @@ public class GoogleBooksAPI {
     }
 
     @GetMapping("/{gBookId}")
+    @Cacheable(value = "books", key = "#gBookId")
     public String getBookById(@PathVariable String gBookId) throws IOException {
         String decodedVolumeId = URLDecoder.decode(gBookId, StandardCharsets.UTF_8);
         System.out.println("Полученный volumeId: " + decodedVolumeId);
@@ -95,6 +97,7 @@ public class GoogleBooksAPI {
     }
 
     @GetMapping("/v2/{gBookId}")
+    @Cacheable(value = "books", key = "#gBookId")
     public String getBookByIdV2(@PathVariable String gBookId) throws IOException {
         String decodedVolumeId = URLDecoder.decode(gBookId, StandardCharsets.UTF_8);
         System.out.println("Полученный volumeId: " + decodedVolumeId);

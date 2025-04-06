@@ -1,6 +1,8 @@
 package com.tometracker.controller;
 
 import com.tometracker.dto.UserDTO;
+import com.tometracker.data_template.UserInfo;
+import com.tometracker.service.UserBookService;
 import com.tometracker.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -12,20 +14,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final UserBookService userBookService;
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, UserBookService userBookService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.userBookService = userBookService;
     }
 
     @PostMapping("/registration")
@@ -65,5 +66,10 @@ public class UserController {
             session.invalidate();
         }
         return ResponseEntity.ok("Logout successful");
+    }
+
+    @GetMapping("/info")
+    public UserInfo getUserInfo() {
+        return userBookService.getUserInfo();
     }
 }
