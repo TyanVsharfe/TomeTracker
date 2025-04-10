@@ -7,11 +7,13 @@ import java.util.List;
 @Getter
 public class UserInfo {
     String username;
+    String subscription;
     Long allBookQuantity;
     List <UserBookCountInfo> userBookQuantity;
 
-    public UserInfo(String username, Long allBookQuantity, List<UserBookCountInfo> userBookQuantity) {
+    public UserInfo(String username, String subscription, Long allBookQuantity, List<UserBookCountInfo> userBookQuantity) {
         this.username = username;
+        this.subscription = subscription;
         this.allBookQuantity = allBookQuantity;
         this.userBookQuantity = userBookQuantity;
     }

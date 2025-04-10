@@ -1,5 +1,6 @@
 package com.tometracker.db.model;
 
+import com.tometracker.data_template.Enums;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +23,12 @@ public class User implements UserDetails {
     @Getter
     @Setter
     private String password;
+    @Getter
     @Setter
     private String email;
+    @Getter
+    @Setter
+    private Enums.subscription subscription;
     @Getter
     @Setter
     @ElementCollection(fetch = FetchType.EAGER)
@@ -34,6 +39,7 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.roles = roles;
+        this.subscription = Enums.subscription.Free;
     }
 
     @Override

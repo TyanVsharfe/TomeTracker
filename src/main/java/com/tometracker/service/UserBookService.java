@@ -194,6 +194,7 @@ public class UserBookService {
             userBookQuantity.add(new UserInfo.UserBookCountInfo(status.name(), userBookRepository.countBooksByStatusAndUser_Username(status, username)));
 
         return new UserInfo(username,
+                author.get().getSubscription().name(),
                 userBookRepository.countAllByUser_Username(username),
                 userBookQuantity
                 );

@@ -8,4 +8,9 @@ public class Enums {
         Abandoned,
         None
     }
+
+    public enum subscription {
+        Free,
+        Tracker
+    }
 }
