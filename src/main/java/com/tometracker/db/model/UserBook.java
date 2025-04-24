@@ -25,9 +25,9 @@ public class UserBook {
     @JoinColumn(name = "book_id", referencedColumnName = "gbId", nullable = false)
     private Book book;
 
-    @OneToMany(mappedBy = "user_book", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Note> notes = new ArrayList<>();
+//    @OneToMany(mappedBy = "user_book", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonManagedReference
+//    private List<Note> notes = new ArrayList<>();
 
     @Setter
     @Column(columnDefinition = "TEXT")

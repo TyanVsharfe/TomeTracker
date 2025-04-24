@@ -25,4 +25,6 @@ public interface UserBookRepository extends CrudRepository<UserBook, Long> {
     @Query("SELECT ub.book FROM UserBook ub WHERE ub.user.username = :username")
     List<Book> findAllBooksByUserUsername(String username);
     List<UserBook> findByBookGbIdAndReviewIsNotNull(String gbId);
+    @Query("SELECT DISTINCT b.genres FROM UserBook ub JOIN ub.book b WHERE ub.user.username = :username")
+    List<String> findDistinctGenresByUsername(String username);
 }

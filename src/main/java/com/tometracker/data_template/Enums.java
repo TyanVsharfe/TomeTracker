@@ -13,4 +13,9 @@ public class Enums {
         Free,
         Tracker
     }
+
+    public enum maturity {
+        Mature,
+        NotMature
+    }
 }

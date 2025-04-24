@@ -92,8 +92,8 @@ public class UserBookService {
                     userBook.getBook(),
                     userBook.getStatus(),
                     userBook.getUserRating(),
-                    userBook.getReview(),
-                    userBook.getNotes()
+                    userBook.getReview()
+                    //userBook.getNotes()
             );
             return Optional.of(userBookDTO);
         } else {
@@ -130,14 +130,14 @@ public class UserBookService {
         book.setUserRating(userBookUpdateDTO.userRating().orElse(book.getUserRating()));
         book.setReview(userBookUpdateDTO.review().orElse(book.getReview()));
 
-        if (userBookUpdateDTO.notes().isPresent()) {
-            userBookUpdateDTO.notes().ifPresent(notes -> {
-                notes.forEach(note -> {
-                    note.setUser_book(book);
-                    book.getNotes().add(note);
-                });
-            });
-        }
+//        if (userBookUpdateDTO.notes().isPresent()) {
+//            userBookUpdateDTO.notes().ifPresent(notes -> {
+//                notes.forEach(note -> {
+//                    note.setUser_book(book);
+//                    book.getNotes().add(note);
+//                });
+//            });
+//        }
 
         System.out.println("Запись изменена");
         userBookRepository.save(book);
@@ -198,5 +198,15 @@ public class UserBookService {
                 userBookRepository.countAllByUser_Username(username),
                 userBookQuantity
                 );
+    }
+
+    public Iterable<String> getAllGenre() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> author = userRepository.findByUsername(authentication.getName());
+        if (author.isEmpty())
+            throw new UsernameNotFoundException("");
+        String username = author.get().getUsername();
+
+        return userBookRepository.findDistinctGenresByUsername(username);
     }
 }

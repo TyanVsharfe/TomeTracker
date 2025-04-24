@@ -10,26 +10,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@Getter
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue
-    @Getter
     private Long id;
-    @Getter
     @Setter
     private String username;
-    @Getter
     @Setter
     private String password;
-    @Getter
     @Setter
     private String email;
-    @Getter
     @Setter
     private Enums.subscription subscription;
-    @Getter
     @Setter
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
