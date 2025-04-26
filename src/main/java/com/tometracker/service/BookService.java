@@ -1,5 +1,6 @@
 package com.tometracker.service;
 
+import com.tometracker.db.model.Author;
 import com.tometracker.db.model.Book;
 import com.tometracker.db.model.User;
 import com.tometracker.db.repository.BookRepository;
@@ -13,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,10 +44,30 @@ public class BookService {
     public Book add(BookDTO bookDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Authentication in /add: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
+        Optional<User> user = userRepository.findByUsername(authentication.getName());
+        if (user.isEmpty())
             throw new UsernameNotFoundException("");
-        return bookRepository.save(new Book(bookDTO));
+
+        Book book = new Book();
+        book.setGbId(bookDTO.gbId());
+        book.setIsbn13(bookDTO.isbn13());
+        book.setTitle(bookDTO.title());
+        book.setCoverUrl(bookDTO.coverUrl());
+        book.setDescription(bookDTO.description());
+        book.setGenres(bookDTO.genres());
+        book.setPageCount(bookDTO.pageCount());
+        book.setPublishedDate(bookDTO.publishedDate());
+        book.setPublisher(bookDTO.publisher());
+
+        List<Author> authorList = new ArrayList<>();
+        for (String authorName : bookDTO.authors()) {
+            Author author = new Author(authorName, book);
+            authorList.add(author);
+        }
+
+        book.getAuthors().addAll(authorList);
+
+        return bookRepository.save(book);
     }
 
     public void update(String gbId, UserBookUpdateDTO userBookUpdateDTO) {

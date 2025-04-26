@@ -191,12 +191,21 @@ public class UserBookService {
 
         List <UserInfo.UserBookCountInfo> userBookQuantity = new ArrayList<>();
         for(Enums.status status: Enums.status.values())
-            userBookQuantity.add(new UserInfo.UserBookCountInfo(status.name(), userBookRepository.countBooksByStatusAndUser_Username(status, username)));
+            userBookQuantity.add(new UserInfo.UserBookCountInfo(status.name(),
+                    userBookRepository.countBooksByStatusAndUser_Username(status, username)));
+
+        List<String> genres = userBookRepository.findDistinctGenresByUsername(username);
+        List<UserInfo.GenreCountInfo> genreQuantity = new ArrayList<>();
+        for (String genre : genres) {
+            long count = userBookRepository.countByUser_UsernameAndBook_GenresContaining(username, genre);
+            genreQuantity.add(new UserInfo.GenreCountInfo(genre, count));
+        }
 
         return new UserInfo(username,
                 author.get().getSubscription().name(),
                 userBookRepository.countAllByUser_Username(username),
-                userBookQuantity
+                userBookQuantity,
+                genreQuantity
                 );
     }
 

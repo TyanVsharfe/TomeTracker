@@ -19,4 +19,13 @@ public class Author {
     @JsonBackReference
     @Setter
     private Book book;
+
+    public Author(String name, Book book) {
+        this.name = name;
+        this.book = book;
+    }
+
+    public Author() {
+
+    }
 }

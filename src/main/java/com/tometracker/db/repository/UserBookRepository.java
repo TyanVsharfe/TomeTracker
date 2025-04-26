@@ -27,4 +27,5 @@ public interface UserBookRepository extends CrudRepository<UserBook, Long> {
     List<UserBook> findByBookGbIdAndReviewIsNotNull(String gbId);
     @Query("SELECT DISTINCT b.genres FROM UserBook ub JOIN ub.book b WHERE ub.user.username = :username")
     List<String> findDistinctGenresByUsername(String username);
+    long countByUser_UsernameAndBook_GenresContaining(String username, String genre);
 }

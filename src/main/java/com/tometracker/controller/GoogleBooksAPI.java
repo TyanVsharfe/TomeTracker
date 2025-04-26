@@ -27,7 +27,7 @@ public class GoogleBooksAPI {
     }
 
     @GetMapping("")
-    public String search(@RequestParam(value = "q") String searchBook, @RequestParam(value = "filter", required = false) String filter) throws IOException {
+    public String search(@RequestParam(value = "q") String searchBook, @RequestParam(value = "filter", required = false) String filter, @RequestParam(value = "genre", required = false) String genre) throws IOException {
         String decodedString = URLDecoder.decode(searchBook, StandardCharsets.UTF_8);
         System.out.println(decodedString);
 
@@ -38,7 +38,11 @@ public class GoogleBooksAPI {
         else {
             query = filter + ":" + decodedString;
         }
+        if (genre != null && !genre.isEmpty()) {
+            query = query + "+subject:" + genre;
+        }
         System.out.println("filter " + filter + "\n" + query);
+        System.out.println("Query: " + query);
 
         Books.Volumes.List volumesList = googleBooksClient.volumes().list(query);
 
