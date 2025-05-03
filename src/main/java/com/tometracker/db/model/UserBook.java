@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tometracker.data_template.Enums;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "user_books")
 @Getter
+@NoArgsConstructor
 public class UserBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +39,6 @@ public class UserBook {
     private Enums.status status;
     @Setter
     private Double userRating;
-
-    public UserBook() {
-
-    }
 
     public UserBook(User user, Book book) {
         this.user = user;

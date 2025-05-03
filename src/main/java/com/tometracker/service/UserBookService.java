@@ -29,11 +29,13 @@ public class UserBookService {
     private final UserBookRepository userBookRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final AchievementProcessorService achievementProcessorService;
 
-    public UserBookService(UserBookRepository userBookRepository, BookRepository bookRepository, UserRepository userRepository) {
+    public UserBookService(UserBookRepository userBookRepository, BookRepository bookRepository, UserRepository userRepository, AchievementProcessorService achievementProcessorService) {
         this.userBookRepository = userBookRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
+        this.achievementProcessorService = achievementProcessorService;
     }
 
     public Iterable<UserBook> getAll(String status) {
@@ -117,16 +119,21 @@ public class UserBookService {
         return userBookRepository.save(new UserBook(author.get(), book.get()));
     }
 
+    @Transactional
     public void update(String gbId, UserBookUpdateDTO userBookUpdateDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Authentication in /update: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
+        User author = userRepository.findByUsername(authentication.getName()).orElseThrow(
+                () -> new UsernameNotFoundException(""));
 
-        UserBook book = userBookRepository.findByBook_GbIdAndUser_Username(gbId, author.get().getUsername()).orElseThrow(
+        UserBook book = userBookRepository.findByBook_GbIdAndUser_Username(gbId, author.getUsername()).orElseThrow(
                 () -> new EntityNotFoundException("Book with id " + gbId + " not found"));
         book.setStatus(userBookUpdateDTO.status().orElse(book.getStatus()));
+
+        if (book.getStatus() == Enums.status.Completed) {
+            achievementProcessorService.processBookCompletion(author, book);
+        }
+
         book.setUserRating(userBookUpdateDTO.userRating().orElse(book.getUserRating()));
         book.setReview(userBookUpdateDTO.review().orElse(book.getReview()));
 
@@ -141,6 +148,19 @@ public class UserBookService {
 
         System.out.println("Запись изменена");
         userBookRepository.save(book);
+    }
+
+    @Transactional
+    public UserBook updateBookStatus(User user, String gbId, Enums.status status) {
+        UserBook userBook = userBookRepository.findByBook_GbIdAndUser_Username(gbId, user.getUsername()).orElseThrow(
+                () -> new EntityNotFoundException("Book with id " + gbId + " not found"));
+        userBook.setStatus(status);
+
+        if (status == Enums.status.Completed) {
+            achievementProcessorService.processBookCompletion(user, userBook);
+        }
+
+        return userBookRepository.save(userBook);
     }
 
     @Transactional

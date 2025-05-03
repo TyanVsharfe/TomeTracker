@@ -5,6 +5,7 @@ import com.tometracker.data_template.Enums;
 import com.tometracker.dto.BookDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Table(name = "books")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Book {
     @Id
     private String gbId;
@@ -46,9 +48,5 @@ public class Book {
         this.publishedDate = bookDTO.publishedDate();
         this.publisher = bookDTO.publisher();
         this.authors.addAll(authors);
-    }
-
-    public Book() {
-
     }
 }

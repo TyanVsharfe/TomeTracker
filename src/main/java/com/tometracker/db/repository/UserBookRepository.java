@@ -18,14 +18,27 @@ public interface UserBookRepository extends CrudRepository<UserBook, Long> {
     Iterable<UserBook> findBooksByStatusAndUser_Username(Enums.status status, String username);
     long countBooksByStatusAndUser_Username(Enums.status status, String username);
     long countAllByUser_Username(String username);
+    long countByUser_UsernameAndBook_GenresContaining(String username, String genre);
 
     @Query("SELECT ub.book FROM UserBook ub WHERE ub.status = :status AND ub.user.username = :username")
     Iterable<Book> findBooksByStatusAndUserUsername(Enums.status status, String username);
 
     @Query("SELECT ub.book FROM UserBook ub WHERE ub.user.username = :username")
     List<Book> findAllBooksByUserUsername(String username);
-    List<UserBook> findByBookGbIdAndReviewIsNotNull(String gbId);
+
+
     @Query("SELECT DISTINCT b.genres FROM UserBook ub JOIN ub.book b WHERE ub.user.username = :username")
     List<String> findDistinctGenresByUsername(String username);
-    long countByUser_UsernameAndBook_GenresContaining(String username, String genre);
+
+    List<UserBook> findByBookGbIdAndReviewIsNotNull(String gbId);
+
+    List<UserBook> findByUserIdAndStatus(Long userId, Enums.status status);
+
+    long countByUserIdAndStatus(Long userId, Enums.status status);
+
+    @Query("SELECT COUNT(DISTINCT b.genres) FROM UserBook ub JOIN ub.book b WHERE ub.user.id = :userId AND ub.status = :status")
+    long countDistinctGenresByUserIdAndStatus(Long userId, Enums.status status);
+
+    @Query("SELECT COUNT(DISTINCT a) FROM UserBook ub JOIN ub.book b JOIN b.authors a WHERE ub.user.id = :userId AND ub.status = :status")
+    long countDistinctAuthorsByUserIdAndStatus(Long userId, Enums.status status);
 }

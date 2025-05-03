@@ -3,14 +3,16 @@ package com.tometracker.db.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "authors")
 @Getter
+@NoArgsConstructor
 public class Author {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
@@ -23,9 +25,5 @@ public class Author {
     public Author(String name, Book book) {
         this.name = name;
         this.book = book;
-    }
-
-    public Author() {
-
     }
 }

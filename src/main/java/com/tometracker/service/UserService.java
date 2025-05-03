@@ -18,28 +18,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final AchievementService achievementService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AchievementService achievementService) {
         this.userRepository = userRepository;
+        this.achievementService = achievementService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User with username" +  username + " not found");
-        }
-
-        User exUser = user.get();
-
-        List<GrantedAuthority> authorities = exUser.getRoles().stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        return new org.springframework.security.core.userdetails.User(
-                exUser.getUsername(),
-                exUser.getPassword(),
-                authorities);
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public Iterable<User> getAllUsers() {
@@ -57,6 +46,7 @@ public class UserService implements UserDetailsService {
         String bcryptPass = new BCryptPasswordEncoder().encode(user.password());
         User newUser = new User(user.username(), bcryptPass, List.of("ROLE_USER"));
         userRepository.save(newUser);
+        achievementService.initializeUserAchievements(newUser);
         return "User registered successfully";
     }
 }
