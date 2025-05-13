@@ -46,4 +46,9 @@ public class BookController {
     public boolean isContains(@PathVariable("id") String id) {
         return bookService.isContains(id);
     }
+
+    @GetMapping("/recommendations")
+    public Iterable<Book> getRecommendationByGenre(@RequestParam(value = "genre") String genre) {
+        return bookService.getRecommendationByGenre(genre);
+    }
 }

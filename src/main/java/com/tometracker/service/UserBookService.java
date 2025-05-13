@@ -1,10 +1,9 @@
 package com.tometracker.service;
 
 import com.tometracker.data_template.Enums;
-import com.tometracker.db.model.Book;
-import com.tometracker.db.model.User;
-import com.tometracker.db.model.UserBook;
+import com.tometracker.db.model.*;
 import com.tometracker.db.repository.BookRepository;
+import com.tometracker.db.repository.ReadingGoalRepository;
 import com.tometracker.db.repository.UserBookRepository;
 import com.tometracker.db.repository.UserRepository;
 import com.tometracker.dto.UserBookDTO;
@@ -30,12 +29,14 @@ public class UserBookService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final AchievementProcessorService achievementProcessorService;
+    private final ReadingGoalRepository readingGoalRepository;
 
-    public UserBookService(UserBookRepository userBookRepository, BookRepository bookRepository, UserRepository userRepository, AchievementProcessorService achievementProcessorService) {
+    public UserBookService(UserBookRepository userBookRepository, BookRepository bookRepository, UserRepository userRepository, AchievementProcessorService achievementProcessorService, ReadingGoalRepository readingGoalRepository) {
         this.userBookRepository = userBookRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.achievementProcessorService = achievementProcessorService;
+        this.readingGoalRepository = readingGoalRepository;
     }
 
     public Iterable<UserBook> getAll(String status) {
@@ -132,6 +133,15 @@ public class UserBookService {
 
         if (book.getStatus() == Enums.status.Completed) {
             achievementProcessorService.processBookCompletion(author, book);
+            Optional<ReadingGoal> optionalGoal = readingGoalRepository.findByUserId(book.getUser().getId());
+
+            optionalGoal.ifPresent(goal -> {
+                goal.setCurrentBooks(goal.getCurrentBooks() + 1);
+                if (goal.getCurrentBooks() >= goal.getTargetBooks()) {
+                    goal.setCompleted(true);
+                }
+                readingGoalRepository.save(goal);
+            });
         }
 
         book.setUserRating(userBookUpdateDTO.userRating().orElse(book.getUserRating()));
@@ -237,5 +247,16 @@ public class UserBookService {
         String username = author.get().getUsername();
 
         return userBookRepository.findDistinctGenresByUsername(username);
+    }
+
+    public Iterable<String> getAllAuthors() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> author = userRepository.findByUsername(authentication.getName());
+        if (author.isEmpty())
+            throw new UsernameNotFoundException("");
+        String username = author.get().getUsername();
+
+        return userBookRepository.findDistinctAuthorsByUsername(username).stream()
+                .map(Author::getName).distinct().toList();
     }
 }

@@ -42,6 +42,11 @@ public class UserBookController {
         return userBookService.getAllGenre();
     }
 
+    @GetMapping("/all-authors")
+    public Iterable<String> getAllAuthors() {
+        return userBookService.getAllAuthors();
+    }
+
     @PutMapping("{id}")
     public void update(@PathVariable("id") String id, @RequestBody UserBookUpdateDTO bookDTO) {
         userBookService.update(id, bookDTO);

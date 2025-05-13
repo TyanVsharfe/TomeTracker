@@ -7,7 +7,6 @@ import com.tometracker.db.repository.BookRepository;
 import com.tometracker.db.repository.UserRepository;
 import com.tometracker.dto.BookDTO;
 import com.tometracker.dto.UserBookUpdateDTO;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,5 +95,13 @@ public class BookService {
 
     public boolean isContains(String gbId) {
         return bookRepository.existsBookByGbId(gbId);
+    }
+
+    public Iterable<Book> getRecommendationByGenre(String genre) {
+        if (genre == null || genre.isEmpty()) {
+            throw new IllegalArgumentException("Genre cannot be null or empty");
+        }
+
+        return bookRepository.findBooksByGenreContaining(genre);
     }
 }

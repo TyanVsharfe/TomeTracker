@@ -52,6 +52,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(registry -> registry
                     .requestMatchers("/gbooks/**").permitAll()
+                    .requestMatchers("/books/recommendations/**").permitAll()
                     .requestMatchers("/users/books/*/reviews").permitAll()
                     .requestMatchers(REGISTRATION_URL, "/users/login").permitAll()
                     .anyRequest().authenticated())

@@ -1,6 +1,7 @@
 package com.tometracker.db.repository;
 
 import com.tometracker.data_template.Enums;
+import com.tometracker.db.model.Author;
 import com.tometracker.db.model.Book;
 import com.tometracker.db.model.UserBook;
 import org.springframework.data.repository.CrudRepository;
@@ -29,6 +30,9 @@ public interface UserBookRepository extends CrudRepository<UserBook, Long> {
 
     @Query("SELECT DISTINCT b.genres FROM UserBook ub JOIN ub.book b WHERE ub.user.username = :username")
     List<String> findDistinctGenresByUsername(String username);
+
+    @Query("SELECT DISTINCT b.authors FROM UserBook ub JOIN ub.book b WHERE ub.user.username = :username")
+    List<Author> findDistinctAuthorsByUsername(String username);
 
     List<UserBook> findByBookGbIdAndReviewIsNotNull(String gbId);
 
