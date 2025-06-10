@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reading_goals")
@@ -48,6 +50,14 @@ public class ReadingGoal {
 
     @Column(nullable = false)
     private Boolean completed = false;
+
+    @ManyToMany
+    @JoinTable(
+            name = "goal_completed_books",
+            joinColumns = @JoinColumn(name = "goal_id"),
+            inverseJoinColumns = @JoinColumn(name = "book_id")
+    )
+    private List<Book> completedBooks = new ArrayList<>();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

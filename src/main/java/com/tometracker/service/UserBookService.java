@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +62,7 @@ public class UserBookService {
         }
     }
 
-    public Iterable<Book> getAllBooks(String status) {
+    public Iterable<UserBook> getAllBooks(String status) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Authentication in /getAllBooks: " + authentication.getName());
         Optional<User> author = userRepository.findByUsername(authentication.getName());
@@ -68,12 +70,12 @@ public class UserBookService {
             throw new UsernameNotFoundException("");
 
         if (status == null || status.isEmpty()) {
-            return userBookRepository.findAllBooksByUserUsername(author.get().getUsername());
+            return userBookRepository.findBooksByUser_Username(author.get().getUsername());
         }
         else {
             try {
                 Enums.status statusEnum = Enums.status.valueOf(status);
-                return userBookRepository.findBooksByStatusAndUserUsername(statusEnum, author.get().getUsername());
+                return userBookRepository.findBooksByStatusAndUser_Username(statusEnum, author.get().getUsername());
             }
             catch (IllegalArgumentException e) {
                 throw new EntityNotFoundException("Invalid game status " + e.getMessage());
@@ -146,6 +148,7 @@ public class UserBookService {
 
         book.setUserRating(userBookUpdateDTO.userRating().orElse(book.getUserRating()));
         book.setReview(userBookUpdateDTO.review().orElse(book.getReview()));
+        book.setUpdatedAt(Instant.from(LocalDateTime.now()));
 
 //        if (userBookUpdateDTO.notes().isPresent()) {
 //            userBookUpdateDTO.notes().ifPresent(notes -> {
@@ -246,7 +249,7 @@ public class UserBookService {
             throw new UsernameNotFoundException("");
         String username = author.get().getUsername();
 
-        return userBookRepository.findDistinctGenresByUsername(username);
+        return userBookRepository.findDistinctGenresByUsername(username).stream().sorted().toList();
     }
 
     public Iterable<String> getAllAuthors() {
@@ -257,6 +260,6 @@ public class UserBookService {
         String username = author.get().getUsername();
 
         return userBookRepository.findDistinctAuthorsByUsername(username).stream()
-                .map(Author::getName).distinct().toList();
+                .map(Author::getName).sorted().distinct().toList();
     }
 }

@@ -96,12 +96,4 @@ public class BookService {
     public boolean isContains(String gbId) {
         return bookRepository.existsBookByGbId(gbId);
     }
-
-    public Iterable<Book> getRecommendationByGenre(String genre) {
-        if (genre == null || genre.isEmpty()) {
-            throw new IllegalArgumentException("Genre cannot be null or empty");
-        }
-
-        return bookRepository.findBooksByGenreContaining(genre);
-    }
 }

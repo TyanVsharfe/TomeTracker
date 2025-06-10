@@ -1,5 +1,6 @@
 package com.tometracker.db.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tometracker.data_template.Enums;
 import jakarta.persistence.*;
@@ -7,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +24,7 @@ public class UserBook {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -39,10 +44,18 @@ public class UserBook {
     private Enums.status status;
     @Setter
     private Double userRating;
+    @Setter
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+
+    @Setter
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     public UserBook(User user, Book book) {
         this.user = user;
         this.book = book;
         this.status = Enums.status.None;
+        this.createdAt = LocalDateTime.now().toInstant(ZoneOffset.UTC);
     }
 }

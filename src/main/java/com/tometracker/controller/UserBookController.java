@@ -1,8 +1,6 @@
 package com.tometracker.controller;
 
-import com.tometracker.db.model.Book;
 import com.tometracker.db.model.UserBook;
-import com.tometracker.dto.BookDTO;
 import com.tometracker.dto.UserBookDTO;
 import com.tometracker.dto.UserBookUpdateDTO;
 import com.tometracker.dto.UserReviewsDTO;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("users/books")
@@ -33,7 +30,7 @@ public class UserBookController {
     }
 
     @GetMapping("/all")
-    public Iterable<Book> getAll(@RequestParam(value = "status", required = false) String status) {
+    public Iterable<UserBook> getAll(@RequestParam(value = "status", required = false) String status) {
         return userBookService.getAllBooks(status);
     }
 

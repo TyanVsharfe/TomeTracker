@@ -32,7 +32,7 @@ public class BookController {
         return bookService.getAll();
     }
 
-    @PutMapping("")
+    @PutMapping("{id}")
     public void update(@PathVariable("id") String id, @RequestBody UserBookUpdateDTO bookDTO) {
         bookService.update(id, bookDTO);
     }
@@ -45,10 +45,5 @@ public class BookController {
     @GetMapping("/check-entity/{id}")
     public boolean isContains(@PathVariable("id") String id) {
         return bookService.isContains(id);
-    }
-
-    @GetMapping("/recommendations")
-    public Iterable<Book> getRecommendationByGenre(@RequestParam(value = "genre") String genre) {
-        return bookService.getRecommendationByGenre(genre);
     }
 }
