@@ -62,20 +62,14 @@ public class UserBookService {
         }
     }
 
-    public Iterable<UserBook> getAllBooks(String status) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication in /getAllBooks: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-
+    public Iterable<UserBook> getAllBooks(String status, User author) {
         if (status == null || status.isEmpty()) {
-            return userBookRepository.findBooksByUser_Username(author.get().getUsername());
+            return userBookRepository.findBooksByUser_Username(author.getUsername());
         }
         else {
             try {
                 Enums.status statusEnum = Enums.status.valueOf(status);
-                return userBookRepository.findBooksByStatusAndUser_Username(statusEnum, author.get().getUsername());
+                return userBookRepository.findBooksByStatusAndUser_Username(statusEnum, author.getUsername());
             }
             catch (IllegalArgumentException e) {
                 throw new EntityNotFoundException("Invalid game status " + e.getMessage());
@@ -83,13 +77,8 @@ public class UserBookService {
         }
     }
 
-    public Optional<UserBookDTO> get(String gbId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication in /get: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-        Optional<UserBook> userB = userBookRepository.findByBook_GbIdAndUser_Username(gbId, author.get().getUsername());
+    public Optional<UserBookDTO> get(String gbId, User author) {
+        Optional<UserBook> userB = userBookRepository.findByBook_GbIdAndUser_Username(gbId, author.getUsername());
 
         if (userB.isPresent()) {
             UserBook userBook = userB.get();
@@ -106,29 +95,19 @@ public class UserBookService {
         }
     }
 
-    public UserBook add(String gbId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication in /add: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-        Optional<UserBook> userBook = userBookRepository.findByBook_GbIdAndUser_Username(gbId,authentication.getName());
+    public UserBook add(String gbId, User author) {
+        Optional<UserBook> userBook = userBookRepository.findByBook_GbIdAndUser_Username(gbId,author.getUsername());
         if (userBook.isPresent())
             throw new EntityExistsException("Book already added");
         Optional<Book> book = bookRepository.findBookByGbId(gbId);
         System.out.println(book);
         if (book.isEmpty())
             throw new IllegalArgumentException("Book not found");
-        return userBookRepository.save(new UserBook(author.get(), book.get()));
+        return userBookRepository.save(new UserBook(author, book.get()));
     }
 
     @Transactional
-    public void update(String gbId, UserBookUpdateDTO userBookUpdateDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication in /update: " + authentication.getName());
-        User author = userRepository.findByUsername(authentication.getName()).orElseThrow(
-                () -> new UsernameNotFoundException(""));
-
+    public void update(String gbId, UserBookUpdateDTO userBookUpdateDTO, User author) {
         UserBook book = userBookRepository.findByBook_GbIdAndUser_Username(gbId, author.getUsername()).orElseThrow(
                 () -> new EntityNotFoundException("Book with id " + gbId + " not found"));
         book.setStatus(userBookUpdateDTO.status().orElse(book.getStatus()));
@@ -177,14 +156,8 @@ public class UserBookService {
     }
 
     @Transactional
-    public void delete(String gbId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication in /delete: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-
-        userBookRepository.deleteBookByBook_GbIdAndUser_Username(gbId, author.get().getUsername());
+    public void delete(String gbId, User author) {
+        userBookRepository.deleteBookByBook_GbIdAndUser_Username(gbId, author.getUsername());
     }
 
     public List<UserReviewsDTO> getBookReviews(String gbId) {
@@ -204,14 +177,8 @@ public class UserBookService {
         );
     }
 
-    public boolean isContains(String gbId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication in /isContains: " + authentication.getName());
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-
-        return userBookRepository.existsBookByBook_GbIdAndUser_Username(gbId, author.get().getUsername());
+    public boolean isContains(String gbId, User author) {
+        return userBookRepository.existsBookByBook_GbIdAndUser_Username(gbId, author.getUsername());
     }
 
     public UserInfo getUserInfo() {
@@ -242,24 +209,12 @@ public class UserBookService {
                 );
     }
 
-    public Iterable<String> getAllGenre() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-        String username = author.get().getUsername();
-
-        return userBookRepository.findDistinctGenresByUsername(username).stream().sorted().toList();
+    public Iterable<String> getAllGenre(User author) {
+        return userBookRepository.findDistinctGenresByUsername(author.getUsername()).stream().sorted().toList();
     }
 
-    public Iterable<String> getAllAuthors() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> author = userRepository.findByUsername(authentication.getName());
-        if (author.isEmpty())
-            throw new UsernameNotFoundException("");
-        String username = author.get().getUsername();
-
-        return userBookRepository.findDistinctAuthorsByUsername(username).stream()
+    public Iterable<String> getAllAuthors(User author) {
+        return userBookRepository.findDistinctAuthorsByUsername(author.getUsername()).stream()
                 .map(Author::getName).sorted().distinct().toList();
     }
 }

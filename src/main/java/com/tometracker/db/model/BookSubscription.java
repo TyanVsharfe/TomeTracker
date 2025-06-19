@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Getter
@@ -62,6 +60,6 @@ public class BookSubscription {
         this.bookUrl = bookUrl;
         this.storeName = storeName;
         this.targetPrice = targetPrice;
-        this.createdAt = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        this.createdAt = Instant.now();
     }
 }

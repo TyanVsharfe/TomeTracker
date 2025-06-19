@@ -1,10 +1,12 @@
 package com.tometracker.controller;
 
+import com.tometracker.db.model.User;
 import com.tometracker.db.model.UserBook;
 import com.tometracker.dto.UserBookDTO;
 import com.tometracker.dto.UserBookUpdateDTO;
 import com.tometracker.dto.UserReviewsDTO;
 import com.tometracker.service.UserBookService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,38 +22,38 @@ public class UserBookController {
     }
 
     @PostMapping("/{id}")
-    public void add(@PathVariable("id") String id) {
-        userBookService.add(id);
+    public void add(@PathVariable("id") String id, @AuthenticationPrincipal User user) {
+        userBookService.add(id, user);
     }
 
     @GetMapping("/{id}")
-    public Optional<UserBookDTO> get(@PathVariable("id") String id) {
-        return userBookService.get(id);
+    public Optional<UserBookDTO> get(@PathVariable("id") String id, @AuthenticationPrincipal User user) {
+        return userBookService.get(id, user);
     }
 
     @GetMapping("/all")
-    public Iterable<UserBook> getAll(@RequestParam(value = "status", required = false) String status) {
-        return userBookService.getAllBooks(status);
+    public Iterable<UserBook> getAll(@RequestParam(value = "status", required = false) String status, @AuthenticationPrincipal User user) {
+        return userBookService.getAllBooks(status, user);
     }
 
     @GetMapping("/all-genres")
-    public Iterable<String> getAllGenres() {
-        return userBookService.getAllGenre();
+    public Iterable<String> getAllGenres(@AuthenticationPrincipal User user) {
+        return userBookService.getAllGenre(user);
     }
 
     @GetMapping("/all-authors")
-    public Iterable<String> getAllAuthors() {
-        return userBookService.getAllAuthors();
+    public Iterable<String> getAllAuthors(@AuthenticationPrincipal User user) {
+        return userBookService.getAllAuthors(user);
     }
 
     @PutMapping("{id}")
-    public void update(@PathVariable("id") String id, @RequestBody UserBookUpdateDTO bookDTO) {
-        userBookService.update(id, bookDTO);
+    public void update(@PathVariable("id") String id, @RequestBody UserBookUpdateDTO bookDTO, @AuthenticationPrincipal User user) {
+        userBookService.update(id, bookDTO, user);
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") String id) {
-        userBookService.delete(id);
+    public void delete(@PathVariable("id") String id, @AuthenticationPrincipal User user) {
+        userBookService.delete(id, user);
     }
 
     @GetMapping("/{gbId}/reviews")
@@ -60,7 +62,7 @@ public class UserBookController {
     }
 
     @GetMapping("/check-entity/{id}")
-    public boolean isContains(@PathVariable("id") String id) {
-        return userBookService.isContains(id);
+    public boolean isContains(@PathVariable("id") String id, @AuthenticationPrincipal User user) {
+        return userBookService.isContains(id, user);
     }
 }

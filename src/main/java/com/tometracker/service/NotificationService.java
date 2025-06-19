@@ -4,7 +4,6 @@ import com.tometracker.db.model.BookSubscription;
 import com.tometracker.db.model.PriceNotification;
 import com.tometracker.db.model.User;
 import com.tometracker.db.repository.PriceNotificationRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -50,6 +48,7 @@ public class NotificationService {
 
         if (newPrice.compareTo(oldPrice) < 0) {
             notificationType = PriceNotification.NotificationType.PRICE_DROP;
+            assert oldPrice != null;
             BigDecimal decrease = oldPrice.subtract(newPrice);
             message = String.format("Цена на книгу \"%s\" снизилась на %.2f (с %.2f до %.2f) в магазине %s",
                     subscription.getBook().getTitle(),
@@ -91,7 +90,7 @@ public class NotificationService {
 
     @Transactional
     public void markNotificationAsRead(Long notificationId, User user) {
-        priceNotificationRepository.markAsReadById(notificationId, user, LocalDateTime.now().toInstant(ZoneOffset.UTC));
+        priceNotificationRepository.markAsReadById(notificationId, user, Instant.now());
     }
 
     @Transactional

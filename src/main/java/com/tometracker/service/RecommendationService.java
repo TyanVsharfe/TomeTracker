@@ -52,10 +52,8 @@ public class RecommendationService {
      * Calculates a relevance score for each potential book based on user preferences
      */
     private Map<Book, Double> calculateBookScores(List<UserBook> userBooks) {
-        // Анализируем предпочтения пользователя
         UserPreferences preferences = analyzeUserPreferences(userBooks);
 
-        // Получаем все книги из репозитория
         Iterable<Book> allBooks = bookRepository.findAll();
         Map<Book, Double> bookScores = new HashMap<>();
 
@@ -100,7 +98,6 @@ public class RecommendationService {
                 for (String genre : book.getGenres()) {
                     genreCounts.merge(genre, 1, Integer::sum);
 
-                    // Если есть рейтинг, учитываем его для жанра
                     if (rating != null) {
                         genreRatings.merge(genre, rating, Double::sum);
                     }
@@ -217,7 +214,7 @@ public class RecommendationService {
      */
     private double calculateMaturityRatingSimilarity(Book book, Enums.maturity preferredMaturityRating) {
         if (book.getMaturityRating() == null || preferredMaturityRating == null) {
-            return 0.5; // Нейтральная оценка при отсутствии данных
+            return 0.5;
         }
 
         return book.getMaturityRating() == preferredMaturityRating ? 1.0 : 0.0;
