@@ -1,64 +1,91 @@
 package com.tometracker.service;
 
-import com.tometracker.data_template.Enums;
+import com.tometracker.db.model.Author;
 import com.tometracker.db.model.Book;
+import com.tometracker.db.model.User;
 import com.tometracker.db.repository.BookRepository;
+import com.tometracker.db.repository.UserRepository;
 import com.tometracker.dto.BookDTO;
-import com.tometracker.dto.BookUpdateDTO;
-import jakarta.persistence.EntityNotFoundException;
+import com.tometracker.dto.UserBookUpdateDTO;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class BookService {
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, UserRepository userRepository) {
         this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
     }
 
-    public Iterable<Book> getAll(String status) {
-        if (status == null || status.isEmpty()) {
-            return bookRepository.findAll();
-        }
-        else {
-            try {
-                Enums.status statusEnum = Enums.status.valueOf(status);
-                return bookRepository.findBooksByStatus(statusEnum);
-            }
-            catch (IllegalArgumentException e) {
-                throw new EntityNotFoundException("Invalid game status " + e.getMessage());
-            }
-        }
+    public Iterable<Book> getAll() {
+        return bookRepository.findAll();
     }
 
     public Optional<Book> get(String gbId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication in /get: " + authentication.getName());
+        Optional<User> author = userRepository.findByUsername(authentication.getName());
+        if (author.isEmpty())
+            throw new UsernameNotFoundException("");
         return bookRepository.findBookByGbId((gbId));
     }
 
     public Book add(BookDTO bookDTO) {
-        return bookRepository.save(new Book(bookDTO));
-    }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication in /add: " + authentication.getName());
+        Optional<User> user = userRepository.findByUsername(authentication.getName());
+        if (user.isEmpty())
+            throw new UsernameNotFoundException("");
 
-    public void update(String gbId, BookUpdateDTO bookUpdateDTO) {
-        Book book = bookRepository.findBookByGbId(gbId).orElseThrow(
-                () -> new EntityNotFoundException("Game with id " + gbId + " not found"));
-        book.setStatus(bookUpdateDTO.status().orElse(book.getStatus()));
-        book.setUserRating(bookUpdateDTO.userRating().orElse(book.getUserRating()));
+        Book book = new Book();
+        book.setGbId(bookDTO.gbId());
+        book.setIsbn13(bookDTO.isbn13());
+        book.setTitle(bookDTO.title());
+        book.setCoverUrl(bookDTO.coverUrl());
+        book.setDescription(bookDTO.description());
+        book.setGenres(bookDTO.genres());
+        book.setPageCount(bookDTO.pageCount());
+        book.setPublishedDate(bookDTO.publishedDate());
+        book.setPublisher(bookDTO.publisher());
 
-        if (bookUpdateDTO.notes().isPresent()) {
-            bookUpdateDTO.notes().ifPresent(notes -> {
-                notes.forEach(note -> {
-                    note.setBook(book);
-                    book.getNotes().add(note);
-                });
-            });
+        List<Author> authorList = new ArrayList<>();
+        for (String authorName : bookDTO.authors()) {
+            Author author = new Author(authorName, book);
+            authorList.add(author);
         }
 
+        book.getAuthors().addAll(authorList);
+
+        return bookRepository.save(book);
+    }
+
+    public void update(String gbId, UserBookUpdateDTO userBookUpdateDTO) {
+//        Book book = bookRepository.findBookByGbId(gbId).orElseThrow(
+//                () -> new EntityNotFoundException("Game with id " + gbId + " not found"));
+//        book.setStatus(userBookUpdateDTO.status().orElse(book.getStatus()));
+//        book.setUserRating(userBookUpdateDTO.userRating().orElse(book.getUserRating()));
+//
+//        if (userBookUpdateDTO.notes().isPresent()) {
+//            userBookUpdateDTO.notes().ifPresent(notes -> {
+//                notes.forEach(note -> {
+//                    note.setBook(book);
+//                    book.getNotes().add(note);
+//                });
+//            });
+//        }
+
         System.out.println("Запись изменена");
-        bookRepository.save(book);
+//        bookRepository.save(book);
     }
 
     @Transactional
@@ -66,7 +93,7 @@ public class BookService {
         bookRepository.deleteBookByGbId(gbId);
     }
 
-    public boolean isContains(String gId) {
-        return bookRepository.existsBookByGbId(gId);
+    public boolean isContains(String gbId) {
+        return bookRepository.existsBookByGbId(gbId);
     }
 }

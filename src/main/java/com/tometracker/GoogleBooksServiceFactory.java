@@ -1,6 +1,5 @@
 package com.tometracker;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.books.v1.Books;
